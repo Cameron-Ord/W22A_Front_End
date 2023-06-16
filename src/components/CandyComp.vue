@@ -10,6 +10,8 @@
 
                 <p>{{ cand['description'] }}</p>
                 
+                <button @click="delete_candy" ref="candy_clicked" :clicked="i">Delete Candy</button>
+                <p v-if="status !== undefined">Rows Deleted: {{ status }}</p>
             </span>
         </article>
     </div>
@@ -21,16 +23,37 @@ import axios from 'axios';
         
         data() {
             return {
-                candy: []
+                candy: [],
+                status: undefined
             }
         },
 
         methods:{
 
 
-            new_candy(){
+            delete_candy(details){
 
-            },
+                this.$refs['candy_clicked'] = details.currentTarget;
+                let button_clicked = this.$refs['candy_clicked'].getAttribute('clicked');
+                let candy_clicked = this.candy[button_clicked]['id'];
+
+
+                axios({
+                    url: 'http://127.0.0.1:5000/api/candy',
+                    method: 'DELETE',
+                    data:{
+                        //getting value from input tag//
+                        id: candy_clicked,
+                    }
+                    }).then(response =>{
+                        console.log(response);
+                        //on api success, displays the amount of rows deleted in a status message//
+                        this.status = response['data'][0]['row_count()'];
+                    }).catch(error =>{
+                        error;
+                        this.status = "Something went wrong."
+                        })
+                        },
 
             get_candy(){
 
